@@ -9,6 +9,8 @@ import { Header, Footer, MAIL } from "@/components/Chrome";
 const FEATURES = [
   {
     title: "GNSS-Denied Ops",
+    span: "wide",
+    chips: [] as string[],
     text: "AI-powered vision-based navigation for operations in EW-congested areas.",
     icon: (
       <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -20,6 +22,8 @@ const FEATURES = [
   },
   {
     title: "Plug-and-Play",
+    span: "narrow",
+    chips: ["MAVLink", "NMEA", "PX4", "ArduPilot"],
     text: "Compatible with MAVLink and NMEA supporting firmware (PX4, ArduPilot).",
     icon: (
       <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -31,6 +35,8 @@ const FEATURES = [
   },
   {
     title: "Platform Agnostic",
+    span: "narrow",
+    chips: ["Rotary", "Hybrid VTOL", "Fixed-wing"],
     text: "Designed to work across rotary, hybrid VTOL or fixed-wing UAVs.",
     icon: (
       <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -43,6 +49,8 @@ const FEATURES = [
   },
   {
     title: "Integrated Unit",
+    span: "wide",
+    chips: [] as string[],
     text: "SWaP optimised. A fully integrated module with sensors and compute.",
     icon: (
       <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -137,9 +145,9 @@ export default function Home() {
           </Reveal>
           <ol className="flow">
             {FLOW.map((f, i) => (
-              <li key={f.n}>
-                <Reveal delay={i * 120} className={`flow-card ${f.tone}`}>
-                  <span className="flow-n">{f.n}</span>
+              <li key={f.n} className={f.tone}>
+                <Reveal delay={i * 160} className="step">
+                  <span className="dotn">{f.n}</span>
                   <h3>{f.title}</h3>
                   <p>{f.text}</p>
                 </Reveal>
@@ -168,10 +176,27 @@ export default function Home() {
           </Reveal>
           <div className="features">
             {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 90} className="feature">
+              <Reveal key={f.title} delay={i * 90} className={`feature ${f.span} f${i + 1}`}>
                 <div className="icon">{f.icon}</div>
                 <h3>{f.title}</h3>
                 <p>{f.text}</p>
+                {f.chips.length > 0 && (
+                  <ul className="chips">
+                    {f.chips.map((c) => <li key={c}>{c}</li>)}
+                  </ul>
+                )}
+                {f.title === "GNSS-Denied Ops" && (
+                  <svg className="feat-art" viewBox="0 0 240 240" aria-hidden="true">
+                    <circle className="r1" cx="120" cy="120" r="110" />
+                    <circle className="r2" cx="120" cy="120" r="78" />
+                    <circle className="r3" cx="120" cy="120" r="46" />
+                    <circle cx="120" cy="120" r="7" className="core" />
+                    <path className="cut" d="M40 40L200 200" />
+                  </svg>
+                )}
+                {f.title === "Integrated Unit" && (
+                  <Image className="feat-img" src="/images/module.png" alt="" width={900} height={600} sizes="400px" aria-hidden="true" />
+                )}
               </Reveal>
             ))}
           </div>
@@ -213,11 +238,6 @@ export default function Home() {
                 <span>supporting firmware</span>
               </div>
             </div>
-            <ul className="chips" aria-label="Supported airframes">
-              <li>Rotary</li>
-              <li>Hybrid VTOL</li>
-              <li>Fixed-wing</li>
-            </ul>
           </Reveal>
         </section>
 
