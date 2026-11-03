@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import FlightScene from "@/components/FlightScene";
 import Reveal from "@/components/Reveal";
-import Decode from "@/components/Decode";
-import Reticle from "@/components/Reticle";
+import RevealText from "@/components/RevealText";
+import ScrollVars from "@/components/ScrollVars";
 import { Header, Footer, MAIL } from "@/components/Chrome";
 
 const FEATURES = [
@@ -79,22 +79,15 @@ const FLOW = [
 export default function Home() {
   return (
     <>
+      <ScrollVars />
       <Header />
       <main id="top">
         {/* ---------- HERO ---------- */}
         <section className="hero">
-          <Image src="/images/terrain.png" alt="" fill priority sizes="100vw" className="hero-terrain" aria-hidden="true" />
-          <div className="scan" aria-hidden="true" />
-          <div className="frame" aria-hidden="true"><i /><i /><i /><i /></div>
-          <div className="status" aria-hidden="true">
-            <span className="dot" /> System online <em>Vision nav ready</em> <em>GNSS denied</em>
-          </div>
-          <Reticle />
+          <div className="hero-bg"><Image src="/images/terrain.png" alt="" fill priority sizes="100vw" className="hero-terrain" aria-hidden="true" /></div>
           <div className="hero-copy">
-            <p className="eyebrow"><Decode text="Visual Positioning System" /></p>
-            <h1>
-              Navigate the modern <Decode text="battlefield" className="hl" delay={250} />
-            </h1>
+            <p className="eyebrow">Visual Positioning System</p>
+            <RevealText as="h1" text="Navigate the modern battlefield" delay={150} />
             <p className="lead">
               AI-powered vision-based navigation that keeps UAVs on course where GNSS is denied, jammed or EW-congested.
             </p>
@@ -114,11 +107,24 @@ export default function Home() {
           <a className="scroll-cue" href="#simulation" aria-label="Scroll to simulation"><span /></a>
         </section>
 
+        {/* ---------- marquee ---------- */}
+        <div className="marquee" aria-hidden="true">
+          <div className="track">
+            {[0, 1].map((k) => (
+              <ul key={k}>
+                {["GNSS-denied ops", "Plug-and-play", "Platform agnostic", "Integrated unit", "MAVLink", "NMEA", "PX4", "ArduPilot", "Rotary", "Hybrid VTOL", "Fixed-wing"].map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+
         {/* ---------- LIVE SIMULATION ---------- */}
         <section id="simulation" className="sim">
           <div className="sim-head">
             <p className="eyebrow">See it in action</p>
-            <h2>Follow one mission, step by step.</h2>
+            <RevealText text="Follow one mission, step by step." />
           </div>
           <FlightScene />
         </section>
@@ -127,7 +133,7 @@ export default function Home() {
         <section id="how" className="section">
           <Reveal>
             <p className="eyebrow">How it works</p>
-            <h2>When GNSS goes dark, navigation shouldn&apos;t.</h2>
+            <RevealText text="When GNSS goes dark, navigation shouldn't." />
           </Reveal>
           <ol className="flow">
             {FLOW.map((f, i) => (
@@ -147,9 +153,7 @@ export default function Home() {
           <Image src="/images/terrain.png" alt="" width={1920} height={1080} className="terrain" aria-hidden="true" />
           <Reveal className="vision-inner">
             <p className="eyebrow">The vision</p>
-            <p className="statement">
-              We are building the next generation of <mark>aerial robotics solutions</mark> from India.
-            </p>
+            <RevealText as="p" className="statement" text="We are building the next generation of aerial robotics solutions from India." hl="aerial robotics solutions" />
             <p className="sub">
               Our vision is to enable resilience and autonomy for UAVs, and to make field-reliable robotics systems a global standard.
             </p>
@@ -160,7 +164,7 @@ export default function Home() {
         <section id="features" className="section">
           <Reveal>
             <p className="eyebrow">Built for the field</p>
-            <h2>Four things that matter on a mission.</h2>
+            <RevealText text="Four things that matter on a mission." />
           </Reveal>
           <div className="features">
             {FEATURES.map((f, i) => (
@@ -177,15 +181,15 @@ export default function Home() {
         <section id="technology" className="section tech">
           <Reveal>
             <p className="eyebrow">The technology</p>
-            <h2>One integrated module. Any compatible UAV.</h2>
+            <RevealText text="One integrated module. Any compatible UAV." />
           </Reveal>
 
           <div className="tech-grid">
-            <Reveal className="panel light">
+            <Reveal className="panel light wipe">
               <Image src="/images/module.png" alt="Stride Dynamics VPS module" width={1800} height={1200} sizes="(max-width: 900px) 100vw, 50vw" />
               <p className="panel-cap">Stride VPS module</p>
             </Reveal>
-            <Reveal delay={120} className="panel light">
+            <Reveal delay={150} className="panel light wipe">
               <Image src="/images/cad.jpg" alt="CAD drawing of the VPS module mounted on a multirotor frame" width={1559} height={1169} sizes="(max-width: 900px) 100vw, 50vw" />
               <p className="panel-cap">Module mounted on a multirotor airframe (CAD)</p>
             </Reveal>
@@ -222,7 +226,7 @@ export default function Home() {
           <Reveal className="cta-box">
             <div>
               <p className="eyebrow">Get in touch</p>
-              <h2>See it navigate without GNSS.</h2>
+              <RevealText text="See it navigate without GNSS." />
               <p className="sub">Request a demonstration or talk to the team about integrating Stride VPS.</p>
             </div>
             <div className="cta-actions">

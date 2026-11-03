@@ -1,26 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import Nav from "@/components/Nav";
 
 export const MAIL = "info@stridedynamics.com";
 
 export function Header() {
-  return (
-    <header className="site-header">
-      <Link href="/" className="brand" aria-label="Stride Dynamics home">
-        <Image src="/images/logo.png" alt="Stride Dynamics" width={180} height={52} priority />
-      </Link>
-      <nav aria-label="Primary">
-        <Link href="/#simulation">Simulation</Link>
-        <Link href="/#how">How it works</Link>
-        <Link href="/#features">Features</Link>
-        <Link href="/#technology">Technology</Link>
-        <Link href="/careers">Careers</Link>
-      </nav>
-      <a className="btn outline" href={`mailto:${MAIL}?subject=Request%20Demonstration`}>
-        Request Demonstration
-      </a>
-    </header>
-  );
+  return <Nav />;
 }
 
 export function Footer() {
