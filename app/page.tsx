@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import FlightScene from "@/components/FlightScene";
+import HeroScene from "@/components/HeroScene";
 import Reveal from "@/components/Reveal";
 import RevealText from "@/components/RevealText";
 import ScrollVars from "@/components/ScrollVars";
 import { Header, Footer, MAIL } from "@/components/Chrome";
+import { SITE, SITE_URL } from "@/lib/site";
 
 const FEATURES = [
   {
@@ -84,15 +86,51 @@ const FLOW = [
   },
 ];
 
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#org`,
+      name: SITE.legalName,
+      alternateName: SITE.name,
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon.png`,
+      email: SITE.email,
+      address: { "@type": "PostalAddress", addressLocality: "Rajkot", addressCountry: "IN" },
+      sameAs: [SITE.linkedin],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE.name,
+      description: SITE.description,
+      inLanguage: "en",
+      publisher: { "@id": `${SITE_URL}/#org` },
+    },
+    {
+      "@type": "Product",
+      "@id": `${SITE_URL}/#vps`,
+      name: "Stride Visual Positioning System",
+      description: SITE.description,
+      brand: { "@id": `${SITE_URL}/#org` },
+      image: `${SITE_URL}/images/module.png`,
+      category: "UAV navigation module",
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <ScrollVars />
       <Header />
       <main id="top">
         {/* ---------- HERO ---------- */}
         <section className="hero">
-          <div className="hero-bg"><Image src="/images/terrain.png" alt="" fill priority sizes="100vw" className="hero-terrain" aria-hidden="true" /></div>
+          <div className="hero-bg"><HeroScene /></div>
           <div className="hero-copy">
             <p className="eyebrow">Visual Positioning System</p>
             <RevealText as="h1" text="Navigate the modern battlefield" delay={150} />

@@ -2,8 +2,16 @@ import type { Metadata } from "next";
 import { Header, Footer, MAIL } from "@/components/Chrome";
 
 export const metadata: Metadata = {
-  title: "Careers | Stride Dynamics",
-  description: "Open positions at Stride Dynamics.",
+  title: "Careers",
+  description: "Open positions at Stride Dynamics, building aerial robotics solutions from India.",
+  alternates: { canonical: "/careers" },
+  openGraph: {
+    type: "website",
+    url: "/careers",
+    title: "Careers | Stride Dynamics",
+    description: "Open positions at Stride Dynamics, building aerial robotics solutions from India.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Stride Dynamics" }],
+  },
 };
 
 export default function Careers() {

@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, Geist_Mono } from "next/font/google";
+import { SITE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -14,16 +15,58 @@ const mono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Visual Positioning System | Stride Dynamics",
-  description:
-    "Advanced Visual Positioning System for UAVs to enable navigation in GNSS-Denied environments.",
-  metadataBase: new URL("https://www.stridedynamics.com"),
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE.title, template: `%s | ${SITE.name}` },
+  description: SITE.description,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.legalName }],
+  creator: SITE.legalName,
+  publisher: SITE.legalName,
+  category: "technology",
+  keywords: [
+    "visual positioning system",
+    "VPS",
+    "GNSS-denied navigation",
+    "vision-based navigation",
+    "UAV navigation",
+    "drone navigation",
+    "EW-congested environments",
+    "MAVLink",
+    "NMEA",
+    "PX4",
+    "ArduPilot",
+    "Stride Dynamics",
+    "aerial robotics India",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Visual Positioning System | Stride Dynamics",
-    description:
-      "AI-powered vision-based navigation for UAVs operating in GNSS-denied, EW-congested environments.",
     type: "website",
+    siteName: SITE.name,
+    locale: "en_IN",
+    url: "/",
+    title: SITE.title,
+    description: SITE.description,
+    images: [{ url: SITE.ogImage, width: 1200, height: 630, alt: "Stride Dynamics — Navigate the modern battlefield. Visual Positioning System for UAVs." }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.title,
+    description: SITE.description,
+    images: [{ url: SITE.ogImage, alt: "Stride Dynamics Visual Positioning System" }],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  formatDetection: { telephone: false, address: false, email: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0e14",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
