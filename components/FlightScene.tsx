@@ -55,8 +55,9 @@ export default function FlightScene() {
     const lblBox = labelBox.current!;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
+    const renderer = new THREE.WebGLRenderer({ antialias: dpr < 1.25, alpha: true, powerPreference: "low-power" });
+    renderer.setPixelRatio(dpr);
     host.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x0a0e14, 130, 330);
@@ -323,13 +324,20 @@ export default function FlightScene() {
     const tgtP = camP.clone(), tgtT = camT.clone();
     let cur = 0, elapsed = 0, last = performance.now(), mx = 0, visible = true, raf = 0;
 
+    // portrait screens: lift the camera for a more top-down view so the whole route fills the panel
+    const applyCam = () => {
+      const portrait = host.clientWidth / Math.max(host.clientHeight, 1) < 1;
+      tgtP.copy(scenes[cur].cam.p);
+      tgtT.copy(scenes[cur].cam.t);
+      if (portrait) { tgtP.y *= 1.5; tgtP.z *= 0.6; }
+    };
+
     const go = (i: number) => {
       cur = i;
       elapsed = 0;
       scenes.forEach((s, k) => (s.group.visible = k === i));
       scenes.forEach((s, k) => { if (k !== i) s.labels.forEach((l) => l.el.classList.remove("on")); });
-      tgtP.copy(scenes[i].cam.p);
-      tgtT.copy(scenes[i].cam.t);
+      applyCam();
       fills.current.forEach((f) => f && (f.style.transform = "scaleX(0)"));
       setStep(i);
     };
@@ -341,9 +349,10 @@ export default function FlightScene() {
       camera.aspect = w / h;
       // push the scene right on wide screens so the headline stays clear
       if (w > 900) camera.setViewOffset(w, h, 0, -h * 0.08, w, h);
-      else camera.setViewOffset(w, h, 0, -h * 0.12, w, h);
-      camera.zoom = w > 900 ? 1 : 0.72;
+      else camera.setViewOffset(w, h, 0, -h * 0.04, w, h);
+      camera.zoom = Math.min(1, Math.max(0.38, camera.aspect / 1.15));   // zoom out on portrait screens so the whole route fits
       camera.updateProjectionMatrix();
+      applyCam();
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -357,6 +366,7 @@ export default function FlightScene() {
     const v = new THREE.Vector3();
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
+      if (now - last < 22) return;                     // cap at ~45 fps
       const dt = Math.min(now - last, 100);
       last = now;
       if (!visible || document.hidden) return;
@@ -379,7 +389,8 @@ export default function FlightScene() {
         // account for the view offset used on wide screens
         const sx = ((v.x * 0.5 + 0.5) * w);
         const sy = (-v.y * 0.5 + 0.5) * h;
-        l.el.style.left = sx + "px";
+        const half = l.el.offsetWidth / 2 + 10;   // keep labels fully inside the panel
+        l.el.style.left = Math.min(Math.max(sx, half), w - half) + "px";
         l.el.style.top = sy + "px";
         l.el.classList.toggle("on", l.on && v.z < 1);
       });

@@ -76,7 +76,7 @@ void main(){
 }`;
 
 const SPEED = 15;          // terrain flow speed (units / s)
-const ROW = 5, STEP = 2.5; // row spacing must be a multiple of the sample step
+const ROW = 6, STEP = 3;   // row spacing must be a multiple of the sample step (coarser lattice = half the vertices)
 
 export default function HeroScene() {
   const host = useRef<HTMLDivElement>(null);
@@ -86,8 +86,9 @@ export default function HeroScene() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const small = window.innerWidth < 900;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const dpr = Math.min(window.devicePixelRatio, 1.5);                 // 2x retina = 4x the pixels; 1.5x looks the same, costs ~45% less
+    const renderer = new THREE.WebGLRenderer({ antialias: dpr < 1.25, alpha: true, powerPreference: "low-power" });
+    renderer.setPixelRatio(dpr);
     el.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, 1, 1, 600);
@@ -95,7 +96,7 @@ export default function HeroScene() {
     camera.lookAt(0, 12, -50);
 
     /* ---- terrain lattice ---- */
-    const X0 = -170, X1 = 170, Z0 = -230, Z1 = 50;
+    const X0 = -162, X1 = 162, Z0 = -228, Z1 = 48;
     const colStep = small ? ROW * 2 : ROW * 1.2;
     const pos: number[] = [], idx: number[] = [];
     const addLine = (pts: number[][]) => {
@@ -187,9 +188,10 @@ export default function HeroScene() {
       scene.add(drop);
       return { ...model, inner, holder, ring, drop, bankK };
     };
-    const jet = mk(makeJet(1.5), 0.06, 7.5);
+    const jet = mk(makeJet(small ? 0.95 : 1.5), 0.06, small ? 5 : 7.5);
     const crafts = [jet];
 
+    let xk = 1;
     type Path = (t: number) => THREE.Vector3;
     // highest possible ground at lateral position x (matches the terrain shader's valley + ridged-noise bound)
     const sstep = (e0: number, e1: number, x: number) => { const t = THREE.MathUtils.clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
@@ -198,7 +200,7 @@ export default function HeroScene() {
     // base altitude + slow, smooth bobbing; never below the ridge line beneath it
     const fly3 = (x: number, z: number, base: number, amp: number, t: number, ph: number) =>
       new THREE.Vector3(x, smax(base + amp * Math.sin(t * 0.75 + ph) + amp * 0.35 * Math.sin(t * 1.7 + ph * 2), groundMax(x) + 4), z);
-    const pathJet: Path = (t) => fly3(32 + 8 * Math.sin(t * 0.45) + 2.5 * Math.sin(t * 1.15), -40 + 7 * Math.sin(t * 0.3), 14, 2.6, t, 0.0);
+    const pathJet: Path = (t) => fly3((32 + 8 * Math.sin(t * 0.45) + 2.5 * Math.sin(t * 1.15)) * xk, -40 + 7 * Math.sin(t * 0.3), 14, 2.6, t, 0.0);
 
     const tgt = new THREE.Object3D();
     const fly = (c: (typeof crafts)[number], path: Path, t: number) => {
@@ -225,6 +227,9 @@ export default function HeroScene() {
       const w = el.clientWidth, h = el.clientHeight;
       renderer.setSize(w, h);
       camera.aspect = w / h;
+      xk = THREE.MathUtils.clamp(camera.aspect / 1.6, 0.28, 1);   // keep the jet's lateral sway on-screen on portrait screens
+      if (w < 900) camera.setViewOffset(w, h, 0, -h * (w < 600 ? 0.33 : 0.12), w, h);   // sit the scene lower, under the text
+      else camera.clearViewOffset();
       camera.updateProjectionMatrix();
     };
     resize();
@@ -238,6 +243,7 @@ export default function HeroScene() {
     let raf = 0, time = reduce ? 8 : 0, last = performance.now();
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
+      if (now - last < 22) return;                     // cap at ~45 fps (saves GPU + battery, esp. on 120Hz screens)
       const dt = Math.min(now - last, 100) / 1000;
       last = now;
       if (!visible || document.hidden) return;
